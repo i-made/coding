@@ -1,5 +1,6 @@
 import numpy as np
-np.random.seed(3)  # for reproducibility
+# random seed
+np.random.seed(3)
 
 import matplotlib.pyplot as plt
 
@@ -101,8 +102,6 @@ def main():
     print('\ncooccurrence_matrix:\n{0}'.format(cooccurrence_matrix))
 
     # Compute cooccurrence matrix in percentage
-    # FYI: http://stackoverflow.com/questions/19602187/numpy-divide-each-row-by-a-vector-element
-    #      http://stackoverflow.com/questions/26248654/numpy-return-0-with-divide-by-zero/32106804#32106804
     cooccurrence_matrix_diagonal = np.diagonal(cooccurrence_matrix)
     with np.errstate(divide='ignore', invalid='ignore'):
         cooccurrence_matrix_percentage = np.nan_to_num(np.true_divide(

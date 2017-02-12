@@ -13,6 +13,12 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame
 
+import sys
+import pandas as pd
+from sklearn.cluster import KMeans
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.metrics import silhouette_samples, silhouette_score
+
 words = [
     "similarity",
     "gensim",
@@ -130,19 +136,6 @@ words = [
     "cnn",
     "convolutional-neural-network"]
 
-# -*- coding: UTF-8 -*-
-#!/usr/bin/env python
-'''
-Author: Nikhil Kulkarni (nikhil.kulkarni@innoplexus.com)
-Date: 17 March 2016
-Usage: python clustering.py
-'''
-import sys
-import pandas as pd
-from sklearn.cluster import KMeans
-from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.metrics import silhouette_samples, silhouette_score
-
 
 def clean_tdm(df):
     "Cleans TDM by removing first column and columns with all zeros"
@@ -182,12 +175,11 @@ def get_clusters(df, k):
 class TDM():
 
     def __init__(self):
-
         data = pd.read_csv('./Wiki_Data.csv')
         self.title_list = ['Doc:' + i.split()[0] for i in data['Text']]
         self.abstract_list = data['Text']
         self.entity_list = [i.replace('-', ' ') for i in words]
-        print len(self.entity_list)
+        # print len(self.entity_list)
 
     def numpy_pandas_csvwriter(self):
         rows = len(self.abstract_list)
@@ -230,16 +222,16 @@ if __name__ == '__main__':
     # tdm_extraction.numpy_pandas_csvwriter()
 
     CSV_PATH = sys.argv[1]
-    tp = pd.read_csv(CSV_PATH, iterator=True)
-    df = pd.concat(tp, ignore_index=True)
+    df = pd.read_csv(CSV_PATH)
+    # df = pd.concat(tp, ignore_i)
     title_df = pd.DataFrame(df['Entity'])
     df = df.set_index('Entity')
     df = df.apply(lambda x: pd.to_numeric(x, errors='ignore'))
-    print df.shape
     df = clean_tdm(df)
     df = get_tfidf_matrix(df)
-    df = pd.concat([title_df, df], axis=1)
+    # df = get_coocc(df)
+    # df = pd.concat([title_df, df], axis=1)
     df.to_csv('final.csv')
-    for i in range(2, 20):
-    results, score = get_clusters(clean_tdm(df), 4)
-    print i, score
+    # for i in range(2, 20):
+    # results, score = get_clusters(clean_tdm(df), 4)
+    # print i, score
