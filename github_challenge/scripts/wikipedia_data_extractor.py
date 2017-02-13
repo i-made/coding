@@ -4,7 +4,7 @@ Pupose : Gihub Data Science Interview
 Date   : February 11, 2017
 Desc   : Extracts wikipedia data given entities
 Data   : Requires keywords.csv file which has entities
-Run    : python wikipedia_data_extractor.py
+Run    : python scripts/wikipedia_data_extractor.py data_files/keywords.csv
 Read   : Generates a json file in 'data_files' folder with wiki text
 '''
 
@@ -23,7 +23,7 @@ def get_entities_from_csv(file_data):
     return words
 
 
-def extract_wiki_data(entities):
+def extract_wiki_data(words):
     # iterates over entities and fetches wikipedia data
     res = dict()
     for i in words:
