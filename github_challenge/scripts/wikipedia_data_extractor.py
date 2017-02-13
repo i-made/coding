@@ -1,3 +1,5 @@
+import re
+import json
 import pandas as pd
 from wikiapi import WikiApi
 wiki = WikiApi()
@@ -118,18 +120,32 @@ words = [
     "f1score",
     "pgm",
     "cnn",
-    "convolutional-neural-network"]
+    "convolutional-neural-network"
+]
 
 res = dict()
 for i in words:
-    results = wiki.find(i)
     print 'searched for ', i
+    results = wiki.find(i)
     print results
     print '*' * 70
     if results:
-        article = wiki.get_article(results[0])
-        text = article.content.encode('ascii', 'ignore')
-        res[i] = text[0:10000]
-
+        text = ''
+        for j, q in enumerate(results):
+            print results[j]
+            article = wiki.get_article(results[j])
+            t = article.content.encode('ascii', 'ignore')
+            print t
+            print '*' * 60
+            t = " ".join(t.split())
+            print '*' * 60
+            text += ' ' + t
+            print '-' * 60
+            print text
+        text = text.replace(',', ' ')
+        text = text.strip()
+        res[i] = text
 data = pd.DataFrame(res.items(), columns=['Entity', 'Text'])
-data.to_csv('Wiki_Data.csv')
+data.to_csv('WikiData.csv')
+with open("wikidata.json", "w") as file:
+    file.write(json.dumps(res, file, indent=4))

@@ -5,16 +5,12 @@ Author: Nikhil Kulkarni (nikhil.kulkarni@innoplexus.com)
 Usage: python tdm.py
 '''
 import re
-import csv
-import time
-import string
-import datetime
+import sys
+import json
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
 
-import sys
-import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.metrics import silhouette_samples, silhouette_score
@@ -134,7 +130,8 @@ words = [
     "f1score",
     "pgm",
     "cnn",
-    "convolutional-neural-network"]
+    "convolutional-neural-network"
+]
 
 
 def clean_tdm(df):
@@ -144,7 +141,7 @@ def clean_tdm(df):
     # L, S, svd = pcp(ddf, verbose=True, svd_method="exact")
     # print L
     # print S
-    ddf.to_csv('new_file.csv', index='pubmed_id')
+    # ddf.to_csv('new_file.csv', index='pubmed_id')
     return ddf
 
 
@@ -175,11 +172,13 @@ def get_clusters(df, k):
 class TDM():
 
     def __init__(self):
-        data = pd.read_csv('./Wiki_Data.csv')
-        self.title_list = ['Doc:' + i.split()[0] for i in data['Text']]
-        self.abstract_list = data['Text']
+        # data = pd.read_csv('./Wiki_Data.csv')
+        with open('wikidata.json') as json_data:
+            data = json.load(json_data)
+        self.title_list = ['Doc:' + i.split()[0] for i in data.values()]
+        self.abstract_list = data.values()
         self.entity_list = [i.replace('-', ' ') for i in words]
-        # print len(self.entity_list)
+        print len(self.entity_list)
 
     def numpy_pandas_csvwriter(self):
         rows = len(self.abstract_list)
@@ -194,7 +193,7 @@ class TDM():
                         r'\b%s\b' %
                         entity,
                         abstract,
-                        re.I
+                        re.IGNORECASE
                     ))
                 except Exception as e:
                     number = 0.0
@@ -218,20 +217,20 @@ class TDM():
 
 
 if __name__ == '__main__':
-    # tdm_extraction = TDM()
-    # tdm_extraction.numpy_pandas_csvwriter()
+    tdm_extraction = TDM()
+    tdm_extraction.numpy_pandas_csvwriter()
 
-    CSV_PATH = sys.argv[1]
-    df = pd.read_csv(CSV_PATH)
-    # df = pd.concat(tp, ignore_i)
-    title_df = pd.DataFrame(df['Entity'])
-    df = df.set_index('Entity')
-    df = df.apply(lambda x: pd.to_numeric(x, errors='ignore'))
-    df = clean_tdm(df)
-    df = get_tfidf_matrix(df)
-    # df = get_coocc(df)
-    # df = pd.concat([title_df, df], axis=1)
-    df.to_csv('final.csv')
-    # for i in range(2, 20):
-    # results, score = get_clusters(clean_tdm(df), 4)
-    # print i, score
+    # CSV_PATH = sys.argv[1]
+    # df = pd.read_csv(CSV_PATH)
+    # # df = pd.concat(tp, ignore_i)
+    # title_df = pd.DataFrame(df['Entity'])
+    # df = df.set_index('Entity')
+    # df = df.apply(lambda x: pd.to_numeric(x, errors='ignore'))
+    # df = clean_tdm(df)
+    # df = get_tfidf_matrix(df)
+    # # df = get_coocc(df)
+    # # df = pd.concat([title_df, df], axis=1)
+    # df.to_csv('final.csv')
+    # # for i in range(2, 20):
+    # # results, score = get_clusters(clean_tdm(df), 4)
+    # # print i, score
