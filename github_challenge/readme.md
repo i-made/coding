@@ -18,7 +18,7 @@
 
 
 
-> Sorting the Similarity column in 'output_verbose.csv' will reveal top matches which look promising.
+> Sorting the Similarity column in 'results_verbose.csv' will reveal top matches which look promising.
 
 
 
@@ -38,9 +38,13 @@ Inside parent folder:
 
 > This will create a DTM CSV file in 'data_files' folder
 
-##### Use this DTM matrix to generate final results using
+##### Use this DTM to generate final results using
 
-``
+`python scripts/gcn.py data_files/DTM_110_114.csv > results.csv`
+> This will create the desired results.csv file in the same folder.
+
+> Please change variable 'thresh' to get more matching the default value is 0.7
+> By experimentation it was found that 0.37 gives less false positives while avoiding false negatives. Provided results are for thresh=0.37
 
 ## **Guidelines**
 
@@ -66,22 +70,75 @@ Inside parent folder:
 
 ## **Approach**
 
-I am using [Wikipedia API](https://github.com/richardasaurus/wiki-api) for generating corpus
+I planned to represent each entity as a vector. This vector will be constructed based on a set of documents. Each value in the vector will be TF*IDF score of that entity in a particular document. For this I needed corpus of documents.
 
-Answers to the following questions are given in the subsequent sections:
+I have used [Wikipedia API](https://github.com/richardasaurus/wiki-api) for generating a corpus. Searching each given entity, resulted in matching wikipedia results. For each result the method appends it's textto yeild a combined text. See 'data_files/Wiki_Data.csv' Or 'data_files/wikidata.json'
 
-What are the pros and cons of your approach?
+Using this I generated Document Term Matrix and at this point I tried two approaches
+1. K-Means clusteing
+2. Cosine Similarity
 
-Which terms do you get correct, which do you get incorrect, and why?
+**K-Means clustering** approach didn't show promising results. I used [Silhouette Score](http://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_silhouette_analysis.html) for selecting best number of clusters.
 
-What trade-offs (if any) did you make and why?
+Following code block was used for K-means clustering and analysis.
 
-'R' generated false positives for abbreviations
-Similarity of 1 is assigned for abbreviations
+
+~~~~
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_samples, silhouette_score
+# df is the pandas dataframe representing matrix
+# k is the number of clusters
+def get_clusters(df, k):
+    "Returns clusters against each document"
+    mat = df.as_matrix()
+    km = KMeans(n_clusters=k)
+    km.fit(mat)
+    labels = km.labels_
+    silhouette_avg = silhouette_score(mat, labels)
+    results = pd.DataFrame([df.index, labels]).T
+    return results, silhouette_avg
+~~~~
+~~~~
+# iterates over different K value
+for i in range(10, 40):
+    results, score = get_clusters(clean_tdm(df), i)
+    print i, score
+~~~~
+
+My own implementation of K-Means clustering is available [here](https://github.com/nikhilkul/info-extraction/blob/master/kmeans_info.py)
+
+Since the formed clusters using this method did not show satisfactory results, I decided to compute [cosine similarity](https://en.wikipedia.org/wiki/Cosine_similarity) between each vector to find which vectors are similar.
+
+**Cosine similarity** was computed using the TF*IDF sparse matrix. It was converted to dense representation using [LIL](https://en.wikipedia.org/wiki/Sparse_matrix) method. Then the similarity was analysed. 'gcn.py' gives the desired output for a threshold value of similarity. After plotting histogram of different similarity values I found that at 0.37 the slope of curve was high. All the results provided are for simililarity > 0.37
+
+I found 110 documents for 114 entities, since four of the entities like 'data engineer' do not have a page on wikipedia. Data Term Matrix has shape 110 X 114 (sparse representation)
+
+*Answers to the following questions are given in the subsequent sections:*
+
+>What are the pros and cons of your approach?
+
+>Which terms do you get correct, which do you get incorrect, and why?
+
+>What trade-offs (if any) did you make and why?
 
 
 #### Pros
+Using this approach, entities like 'precision', 'recall' can be matched! 
+
+Even though these entities do not share any letter similarity, they are used in similar context. This context is captured by the vector representation of entities. 
+
+Wikipedia is a credible source of data and the results using this method look promising even if the words are widely used in english. e.g. the word 'spark' is correctly with other technical entities even though 'spark' also has a different meaning in english. Words like word2vec are unusual since it has a digit sandwhiched between letters. 
+
+Finding good match for this entity would be difficult by conventional method. But since we are converting word to a vector it becomes easy to represent the entities in terms of numbers and get comparison based on context. Context of 'embeddings' and 'word2vec' correctly matches here which is pleasantly surprising!
+
 #### Cons
+
+This method is highly dependent on the data and assumes that entities will be seen in the corpus. If the entity is absent in the corpus the similarity which is nothing but a dot product between two vectors will be zero. Here, for example, 'hadoop mr' is never seen in wikipedia. This means the vector representing 'hadoop mr' is all zeros. 
+~~~~
+'hadoop mr' = [0 0 0 0 0 0 0 0 .... ]
+~~~~
+Dot product of a zero vector with any vector will be zero and the similarity will always be zero. Another thing to notice here is that the frequency of the word in a document plays a role. if all the documents mention one particular word too many times then that particular word will create false positives.
+
 #### Results and Discussion
 I am listing down some of the encouraging results:
 
@@ -146,13 +203,18 @@ I am listing down some of the encouraging results:
 | mapreduce                    | hadoop                         | mapr                           | map reduce                   | mr                           |
 | software                     | application                    |                                |                              |                              |
 
-'hadoop mr' doesn't appear in data
+Eventhough most of the words seem correct, one thing should be noticed that number of false negatives can be high. Words like python2, python3 etc. have no pages linked to them on wikipedia. Since their vector representation is a all zero vector they won't be shown as similar to any enitiy. Words like 'mllib','graphx' appear together with 'spark','apache-spark' since they are under the same project 'apache-spark'. Desirability of such matching might be unwanted. Also note that 'hadoop' appears with 'mapreduce' since they often appear together.
+
+#### Trade-offs
+Matching acronyms proved difficult specially with the presence of 'R'. 'R' generated false positives for abbreviations e.g. acronym of 'representation','recommendation' etc. is 'R'.
+To deal with this issue, I have added a spetial rule. Similarity of 1 is assigned for abbreviations which might not be true always but works most of the time.
+I have also replaced '-' in the term with space so that natural-language becomes natural language. This helped in searching entity in text and on wikipedia.
 
 ## **Performance**
 
 #### Time Complexity
 
-Time complexity in the generation of Document Term Matrix and similarity search remains O(n^2) but can be reduced further.
+Time complexity in the generation of Document Term Matrix and similarity search remains O(n^2) but with more time it can be reduced further.
 
 #### Space Complexity 
 
