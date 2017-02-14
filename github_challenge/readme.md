@@ -1,3 +1,25 @@
+## **Guidelines**
+
+  - [Description](#description)
+    - [Overview](#overview)
+    - [Reproducing results](#reproducing-results)
+  - [Guidelines](#guidelines)
+      - [Approach](#approach)
+        - [Pros](#pros)
+        - [Cons](#cons)
+        - [Results and Discussion](#results-and-discussion)
+      - [Performance](#performance)
+        - [Time Complexity](#time-complexity)
+        - [Space Complexity](#space-complexity)
+      - [Future Scope](#future-scope)
+        - [Scaling Up](#scaling-up)
+        - [To do](#to-do)
+        - [Key Element Optimisation](#key-element-optimisation)
+      - [How to improve](#how-to-improve)
+        - [Active learning](#active-learning)
+        - [Choosing knowledge base](#choosing-knowledge-base)
+        - [Final Thoughts](#final-thoughts)
+
 ## **Description**
 
 ### Overview
@@ -52,27 +74,7 @@ python scripts/gcn.py data_files/DTM_110_114.csv > results.csv
 > Please change variable 'thresh' to get more matching the default value is 0.7
 > By experimentation it was found that 0.37 gives less false positives while avoiding false negatives. Provided results are for thresh=0.37
 
-## **Guidelines**
 
-  - [Description](#description)
-    - [Overview](#overview)
-    - [Reproducing results](#reproducing-results)
-  - [Guidelines](#guidelines)
-      - [Approach](#approach)
-        - [Pros](#pros)
-        - [Cons](#cons)
-        - [Results and Discussion](#results-and-discussion)
-      - [Performance](#performance)
-        - [Time Complexity](#time-complexity)
-        - [Space Complexity](#space-complexity)
-      - [Future Scope](#future-scope)
-        - [Scaling Up](#scaling-up)
-        - [To do](#to-do)
-        - [Key Element Optimisation](#key-element-optimisation)
-      - [How to improve](#how-to-improve)
-        - [Active learning](#active-learning)
-        - [Choosing knowledge base](#choosing-knowledge-base)
-        - [Links to datasets](#links-to-datasets)
 
 ## **Approach**
 
