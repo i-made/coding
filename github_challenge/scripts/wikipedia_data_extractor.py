@@ -18,7 +18,10 @@ from wikiapi import WikiApi
 wiki = WikiApi({'locale': 'en'})
 
 
-def get_entities_from_csv(file_data):
+def get_entities_from_csv(entity_filename="data_files/keywords.csv"):
+    # reads keywords.csv file
+    file_data = pd.read_csv(entity_filename)
+    # words variable stores entities in a list
     words = list(set(file_data[file_data.columns[0]]))
     return words
 
@@ -53,11 +56,8 @@ def json_file_writer(res, filename="data_files/wikidata.json"):
 
 
 def main():
-    # reads keywords.csv file
-    entity_file_name = sys.argv[1]
-    file_data = pd.read_csv(entity_file_name)
-    # words variable stores entities in a list
-    words = get_entities_from_csv(file_data)
+    csv_file_name = sys.argv[1]
+    words = get_entities_from_csv(csv_filename)
     # res has wikipedia corpus in a dictionary
     res = extract_wiki_data(words)
     # writes the data to a json file in data_files folder

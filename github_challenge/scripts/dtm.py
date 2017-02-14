@@ -3,9 +3,9 @@ Author : Nikhil Kulkarni
 Pupose : Gihub Data Science Interview
 Date   : February 11, 2017
 Desc   : Generates Document Term Matrix (DTM)
-Data   : Requires wikipedia data JSON file
-Run    : python dtm.py wikidata.json
-Read   : Generated DTM has [Documents x Terms] with (tf * idf) freq
+Data   : Requires wikipedia data JSON file 'wikidata.json'
+Run    : python scripts/dtm.py data_files/keywords.csv data_files/wikidata.json
+Read   : Generated DTM in 'data_files' folder has [Documents x Terms] with (tf * idf) freq
 '''
 
 import re
@@ -15,9 +15,8 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame
 
-# imports variable words which is the list of input entities
-# i.e. words = ['c#','machine-learning','csharp',....]
-from entities import words
+from wikipedia_data_extractor import get_entities_from_csv
+from sklearn.feature_extraction.text import TfidfTransformer
 
 
 def clean_dtm(df):
@@ -38,21 +37,15 @@ def get_tfidf_matrix(data_matrix):
 class DTM():
 
     # This class handles generation of Document term matrix
-    # It requires a dictionary where key is a term and value is the document
+    # It requires a dictionary where key is a title and value is the text of document
     # i.e. data = { "csharp": "C-Sharp is a programming ....", "nlp": "..."...}
 
-    def __init__(self):
+    def __init__(self, corpus_dictionary, entities):
         # data = pd.read_csv('./Wiki_Data.csv')
 
-        # wikidata is the dictionary file with terms as keys and docs as values
-        with open('wikidata.json') as json_data:
-            data = json.load(json_data)
-
-        self.title_list = ['Doc:' + i.split()[0] for i in data.values()]
-        self.abstract_list = data.values()
-        self.entity_list = [i.replace('-', ' ') for i in words]
-
-        # print len(self.entity_list)
+        self.title_list = ['Doc:' + i for i in corpus_dictionary.keys()]
+        self.abstract_list = corpus_dictionary.values()
+        self.entity_list = entities
 
     def numpy_pandas_csvwriter(self):
 
@@ -66,23 +59,28 @@ class DTM():
         for abs_idx, abstract in enumerate(self.abstract_list):
             print abs_idx, len(self.abstract_list)
             for ent_idx, entity in enumerate(self.entity_list):
-                try:
-                    number = len(re.findall(
-                        r'\b%s\b' %
-                        entity,
-                        abstract,
-                        re.IGNORECASE
-                    ))
-                except Exception as e:
-                    number = 0.0
+                entities = list(set([entity, entity.replace('-', ' ')]))
+                number = 0
+                for en in entities:
+                    try:
+                        number = number + len(
+                            re.findall(
+                                r'\b%s\b' %
+                                en,
+                                abstract,
+                                re.IGNORECASE
+                            )
+                        )
+                    except Exception as e:
+                        print e, entity
+                        number = number + 0
                 term_matrix[ent_idx][abs_idx] = number
 
-        # Generaes pandas dataframe
+        # Generates pandas dataframe
         df = self.pandas_to_csv(term_matrix.transpose())
         return df
 
     def pandas_to_csv(self, matrix):
-        index_name = 'Entity'
 
         rows = len(self.abstract_list)
         columns = len(self.entity_list)
@@ -92,14 +90,14 @@ class DTM():
             columns=[entity for entity in self.entity_list],
             index=[entity for entity in self.title_list]
         )
-        df.index.name = index_name
 
-        # title_df = pd.DataFrame(df['Entity'])
-        # df = df.set_index('Entity')
-        # df = df.apply(lambda x: pd.to_numeric(x, errors='ignore'))
-        # df = clean_tdm(df)
-        # df = get_tfidf_matrix(df)
-        # df = pd.concat([title_df, df], axis=1)
+        index_name = 'Entity'
+        df.index.name = index_name
+        #df.to_csv('DTM_%d_%d.csv' % (rows, columns), index=True)
+
+        # Cleans Empty columns and get TF*IDF frequencies of entities
+        df = clean_dtm(df)
+        df = get_tfidf_matrix(df)
 
         # Outputs a Document Term matrix
         df.to_csv('DTM_%d_%d.csv' % (rows, columns), index=True)
@@ -107,6 +105,29 @@ class DTM():
         return df
 
 
+def main():
+    if sys.argv[1] and sys.argv[2]:
+        entity_filename = sys.argv[1]
+        corpus_filename = sys.argv[2]
+    else:
+        print 'First Arg: Entity CSV file'
+        print 'Second Arg: Corpus JSON file'
+
+    # imports variable words which is the list of input entities
+    # i.e. words = ['c#','machine-learning','csharp',....]
+    entities = get_entities_from_csv(entity_filename)
+
+    # wikidata is the dictionary file with titles as keys and docs as values
+    with open(corpus_filename) as json_data:
+        corpus_dictionary = json.load(json_data)
+
+    print len(entities)
+    print len(corpus_dictionary.keys())
+
+    # calls TDM Class
+    dtm_extraction = DTM(corpus_dictionary, entities)
+    dtm_extraction.numpy_pandas_csvwriter()
+
+
 if __name__ == '__main__':
-    tdm_extraction = TDM()
-    tdm_extraction.numpy_pandas_csvwriter()
+    main()

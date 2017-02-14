@@ -4,8 +4,8 @@ Pupose : Gihub Data Science Interview
 Date   : February 11, 2017
 Desc   : Performs Entity Matching and outputs clusters
 Data   : Requires Term-Document-Matrix CSV file
-Run    : python gcn.py TDM_111_115.csv > output.csv
-Read   : Similarities are in descending order in output.csv
+Run    : python gcn.py DTM_110_114.csv > results.csv
+Read   : Similarities are in descending order in results.csv
 '''
 
 import sys
@@ -25,9 +25,9 @@ canonical = list()
 
 
 def csv_output(sim_tuples):
-        # This function will generate desired csv file
-        # while using this function use '> output.csv'
-        # i.e. python gcn.py TDM_111_115.csv > output.csv
+    # This function will generate desired csv file
+    # while using this function use '> output.csv'
+    # i.e. python gcn.py TDM_111_115.csv > output.csv
 
     # Rearrange list of list in descending order of similarities
     for k, v in sim_tuples.items():
@@ -35,14 +35,13 @@ def csv_output(sim_tuples):
 
     # Uncomment following statement to see detained output dictionary
     # pprint(sim_tuples)
-
     for k, v in sim_tuples.items():
         z = ",".join([i[0] for i in v])
         print k, ',', z
 
 
 def process_similarities(similarities, entities):
-        # Dictionary which holds tuples
+    # Dictionary which holds tuples
     siml = dict()
     # Canonical variable maintains list of canonical entities
     # This will help in deduplication of tuples
