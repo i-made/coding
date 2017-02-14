@@ -28,19 +28,25 @@ Inside parent folder:
 
 ##### Extract wikipedia data for corresponding entities using
 
-`python scripts/wikipedia_data_extractor.py data_files/keywords.csv`
+````
+python scripts/wikipedia_data_extractor.py data_files/keywords.csv
+````
 
 > This will create a wikidata.json file in the 'data_files' folder
 
 ##### Generate Document Term Matrix for this corpus dictionary using
 
-`python scripts/dtm.py data_files/keywords.csv data_files/wikidata.json`
+````
+python scripts/dtm.py data_files/keywords.csv data_files/wikidata.json
+````
 
 > This will create a DTM CSV file in 'data_files' folder
 
 ##### Use this DTM to generate final results using
 
-`python scripts/gcn.py data_files/DTM_110_114.csv > results.csv`
+````
+python scripts/gcn.py data_files/DTM_110_114.csv > results.csv
+````
 > This will create the desired results.csv file in the same folder.
 
 > Please change variable 'thresh' to get more matching the default value is 0.7
@@ -78,7 +84,7 @@ Using this I generated Document Term Matrix and at this point I tried two approa
 1. K-Means clusteing
 2. Cosine Similarity
 
-**K-Means clustering** approach didn't show promising results. I used [Silhouette Score](http://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_silhouette_analysis.html) for selecting best number of clusters.
+***K-Means Clustering*** approach didn't show promising results. I used [Silhouette Score](http://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_silhouette_analysis.html) for selecting best number of clusters.
 
 Following code block was used for K-means clustering and analysis.
 
@@ -86,8 +92,10 @@ Following code block was used for K-means clustering and analysis.
 ~~~~
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_samples, silhouette_score
+
 # df is the pandas dataframe representing matrix
 # k is the number of clusters
+
 def get_clusters(df, k):
     "Returns clusters against each document"
     mat = df.as_matrix()
@@ -109,7 +117,7 @@ My own implementation of K-Means clustering is available [here](https://github.c
 
 Since the formed clusters using this method did not show satisfactory results, I decided to compute [cosine similarity](https://en.wikipedia.org/wiki/Cosine_similarity) between each vector to find which vectors are similar.
 
-**Cosine similarity** was computed using the TF*IDF sparse matrix. It was converted to dense representation using [LIL](https://en.wikipedia.org/wiki/Sparse_matrix) method. Then the similarity was analysed. 'gcn.py' gives the desired output for a threshold value of similarity. After plotting histogram of different similarity values I found that at 0.37 the slope of curve was high. All the results provided are for simililarity > 0.37
+***Cosine Similarity*** was computed using the TF*IDF sparse matrix. It was converted to dense representation using [LIL method](https://en.wikipedia.org/wiki/Sparse_matrix). Then the similarity was analysed. 'gcn.py' gives the desired output for a threshold value of similarity. After plotting histogram of different similarity values I found that at 0.37 the slope of curve was high. All the results provided are for simililarity > 0.37
 
 I found 110 documents for 114 entities, since four of the entities like 'data engineer' do not have a page on wikipedia. Data Term Matrix has shape 110 X 114 (sparse representation)
 
@@ -172,7 +180,7 @@ I am listing down some of the encouraging results:
 |precision               | recall                         | 0.711147686 |
 |f score               | precision                    | 0.704043164 |    
 
-> This similarity table produces following results in the final set with threshold 0.3
+This similarity table produces following results in the final set with threshold 0.37
 
 | load                         | extract                        | transform                      | etl                          |                              |
 |------------------------------|--------------------------------|--------------------------------|------------------------------|------------------------------|
@@ -203,7 +211,7 @@ I am listing down some of the encouraging results:
 | mapreduce                    | hadoop                         | mapr                           | map reduce                   | mr                           |
 | software                     | application                    |                                |                              |                              |
 
-Eventhough most of the words seem correct, one thing should be noticed that number of false negatives can be high. Words like python2, python3 etc. have no pages linked to them on wikipedia. Since their vector representation is a all zero vector they won't be shown as similar to any enitiy. Words like 'mllib','graphx' appear together with 'spark','apache-spark' since they are under the same project 'apache-spark'. Desirability of such matching might be unwanted. Also note that 'hadoop' appears with 'mapreduce' since they often appear together.
+Eventhough most of the words seem correct, one thing should be noticed that number of false negatives can be high. Words like python2, python3 etc. have no pages linked to them on wikipedia. Since their vector representation is a all zero vector they won't be shown as similar to any entity. Words like 'mllib','graphx' appear together with 'spark','apache-spark' since they are under the same project 'apache-spark'. Desirability of such a match is debatable. Also note that, 'hadoop' appears with 'mapreduce' since they often appear together. Match of 'software' with 'application' is particularly interesting since they don't share a lot letters between them.
 
 #### Trade-offs
 Matching acronyms proved difficult specially with the presence of 'R'. 'R' generated false positives for abbreviations e.g. acronym of 'representation','recommendation' etc. is 'R'.
@@ -226,30 +234,49 @@ Sparse representation of dense matrix in the LIL (list of lists) form reduces bo
 
 Answers to the following questions are given in the subsequent sections:
 
-What are your thoughts on future work for this project?
+> What are your thoughts on future work for this project?
 
-what considerations would you need to make for scaling up the project?
+> What considerations would you need to make for scaling up the project?
 
-What trade-offs (if any) did you make and why?
+> What trade-offs (if any) did you make and why?
 
 #### Scaling Up
+During my professional work experience, I have worked upon a similar problem statement where we were trying to find what is the probability of knowing 'java' given the person knows 'c++'. In that particular project I looked at the relations between entities  e.g. 'is a' relation, 'has a' relation. Relations can help solve some hidden entity matching problem e.g. "'graphx' is under 'apache-spark' project" suggests that 'apache-spark' is the parent entity for 'graphx'. We can add features like these to the existing vectors and then do feature engineering using standard techniques to get best precision for a known set of data. Addition of data from different source will play an important role. We can assign confidence to each data source and depending upon the confidence we can then assign feature weights. e.g. features from wikipedia get high weightage.
+
+
 #### To do
-#### Key Element Optimisation
+
+The wikipedia data fetching can be done offline. Matrix creation can also be done in dense format at its birth. Indexing the documents will help in the search process. Databases like elasticsearch are indexed using lucene and can be used effectively to find frequncies. Additionally, spark computes word frequencies effeciently and can be clustered making it ideal to for scaling.
+
+#### Key Element Optimization
+
+For scaling up, I will optimize the matrix generation step since it is the slowest among all. Also, newer tools like spark allow matrix operations to be performed. Right now, for modularity I have written the matrix in CSV and then loaded it again. This step can be avoided. Some documents have no words while some documents can convey same information. Such documents can be identified using feature reduction techniques such as finding variance withing a feature, finding linear combination etc. This will help in reducing the size of the matrix and improving results.
 
 ### How to improve
 
 Answers to the following questions are given in the subsequent sections:
 
-What would you do differently with more time? 
+>What would you do differently with more time? 
 
-What are the key elements that would require more thought? 
+>What are the key elements that would require more thought? 
 
-What would you like to know or learn if you worked more on this project?
+>What would you like to know or learn if you worked more on this project?
 
 #### Active learning
-#### Choosing knowledge base
-#### Links to datasets
+Here, unlabeled data is abundant but manually labeling is expensive, learning algorithms can actively query the user/teacher for labels. This will unable us to use active learning techniques. Online learning can also produce interesting result since the data is constantly being updated. Given enough time I would create a graph data basse of all the enitites and assign probabilites to each relation between nodes. Using online learning these weights will constantly get updated and produce similar entities through graph traversals. I would like to learn more about this type of learning.
 
+#### Choosing knowledge base and performance metrics
+Choice of data is essential and learned vector embeddings for each entity are heavily dependent upon the choice of data. This part certainly requires more thought. We will need to make sure that the data represents all of the entities and considers variations globally and not locally. The measurement of accuracy is also a key element that will need more thought since we do not have labels. Definition of performance maetrices for models is crucial.
+
+#### Links to datasets
+I would like to know the algorithms and techniques used for solving such problems on scale. With size of the data this problems becomes more computationally expensive to solve. One of the datasets I find useful for this particular use case is Wikipedia's 'redirects' dataset. This data is very rich and can be helpful in entity disambiguation.
+Find few links to redirects data below: 
+[c#](http://dispenser.homenet.org/~dispenser/cgi-bin/rdcheck.py?page=C-sharp),
+[machine learning](http://dispenser.homenet.org/~dispenser/cgi-bin/rdcheck.py?page=machine_learning)
+[mysql](http://dispenser.homenet.org/~dispenser/cgi-bin/rdcheck.py?page=mysql)
+etc.
+
+For mysql we can see that we get important matches from the redirect links itself.
 
 
 
