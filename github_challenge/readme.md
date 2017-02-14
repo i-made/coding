@@ -241,7 +241,9 @@ Answers to the following questions are given in the subsequent sections:
 > What trade-offs (if any) did you make and why?
 
 #### Scaling Up
-During my professional work experience, I have worked upon a similar problem statement where we were trying to find what is the probability of knowing 'java' given the person knows 'c++'. In that particular project, I looked at the relations between entities  e.g. 'is a' relation, 'has a' relation. Relations can help solve some hidden entity matching problem e.g. "'graphx' is under 'apache-spark' project" suggests that 'apache-spark' is the parent entity for 'graphx'. We can add features like these to the existing vectors and then do feature engineering using standard techniques to get the best precision for a known set of data. The addition of data from the different source will play an important role. We can assign confidence to each data source and depending upon the confidence we can then assign feature weights. e.g. features from Wikipedia get high weight.
+During my professional work experience, I have worked on a similar problem statement where we were trying to find what is the probability of knowing 'java' given the person knows 'c++'. In that particular project, I looked at the relations between entities  e.g. 'is a' relation, 'has a' relation. Relations can help solve some hidden entity matching problem e.g. "graphx is under apache-spark project" suggests that 'apache-spark' is the parent entity for 'graphx'. We can add features like these to the existing vectors and then do feature engineering using standard techniques to get the best precision for a known set of data. The addition of data from the different source will play an important role. We can assign confidence to each data source and depending upon the confidence we can then assign feature weights. e.g. features from Wikipedia get high weight.
+
+Since the entities were small in number I could fetch wikipedia data quickly. One of the trade-offs could be the time required for each wikipedia API call. While scaling up this part will need some attention.
 
 
 #### To do
@@ -250,7 +252,9 @@ The Wikipedia data fetching can be done offline. Matrix creation can also be don
 
 #### Key Element Optimization
 
-For scaling up, I will optimize the matrix generation step since it is the slowest among all. Also, newer tools like spark allow matrix operations to be performed. Right now, for modularity, I have written the matrix in CSV and then loaded it again. This step can be avoided. Some documents have no words while some documents can convey the same information. Such documents can be identified using feature reduction techniques such as finding variance withing a feature, finding linear combination etc. This will help in reducing the size of the matrix and improving results.
+For scaling up, I will optimize the matrix generation step since it is the slowest among all. Also, newer tools like spark allow matrix operations to be performed. Right now, for modularity, I have written the matrix in CSV and then loaded it again. This step can be avoided. 
+
+Some documents have no words while some documents can convey the same information. Such documents can be identified using feature reduction techniques such as finding variance within a feature, finding linear combination etc. Based on these parameters we can remove features. This will help in reducing the size of the matrix and improving results.
 
 ### How to improve
 
