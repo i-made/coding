@@ -263,17 +263,21 @@ Answers to the following questions are given in the subsequent sections:
 >What would you like to know or learn if you worked more on this project?
 
 #### Active learning
-Here, unlabeled data is abundant but manually labeling is expensive, learning algorithms can actively query the user/teacher for labels. This will enable us to use active learning techniques. Online learning can also produce interesting result since the data is constantly being updated. Given enough time I would create a graph database of all the entities and assign probabilities to each relation between nodes. Using online learning these weights will constantly get updated and produce similar entities through graph traversals. I would like to learn more about this type of learning.
+Here, unlabeled data is abundant but manually labeling is expensive. Learning algorithms can actively query the user/teacher for labels. This will enable us to use active learning techniques. "Online Learning" algorithms can also produce interesting results since the data is constantly being updated. Given enough time, I would create a graph database of all the entities and assign probabilities to each relation between nodes. With Online Learning these weights will constantly get updated. Similar entities can be found through graph traversals. I would like to learn and work more on this approach.
 
-#### Choosing knowledge base and performance metrics
-Choice of data is essential and learned vector embeddings for each entity are heavily dependent upon the choice of data. This part certainly requires more thought. We will need to make sure that the data represents all of the entities and considers variations globally and not locally. The measurement of accuracy is also a key element that will need more thought since we do not have labels. Definition of performance matrices for models is crucial.
+#### Choosing knowledge base
+Choice of data is essential and learnt vector embeddings for each entity are heavily dependent upon the choice of data. This part certainly requires more thought. We will need to make sure that the data represents all of the entities fairly and considers variations globally and not locally. The measurement of accuracy is also a key element that will need more thought since we do not have labels. Definition of performance matrices for models is crucial.
 
 #### Links to datasets
-I would like to know the algorithms and techniques used for solving such problems on the scale. With a size of the data, this problems becomes more computationally expensive to solve. One of the datasets I find useful for this particular use case is Wikipedia's 'redirects' dataset. This data is very rich and can be helpful in entity disambiguation.
+I would like to know the algorithms and techniques used for solving problems like this on scale. With large size of the data, this problems becomes more computationally expensive to solve. One of the datasets I found useful for this particular use case is Wikipedia's 'Redirects' dataset. This data is very rich and can be helpful in entity disambiguation.
 Find few links to redirects data below: 
+
 [c#](http://dispenser.homenet.org/~dispenser/cgi-bin/rdcheck.py?page=C-sharp),
-[machine learning](http://dispenser.homenet.org/~dispenser/cgi-bin/rdcheck.py?page=machine_learning)
+
+[machine learning](http://dispenser.homenet.org/~dispenser/cgi-bin/rdcheck.py?page=machine_learning),
+
 [mysql](http://dispenser.homenet.org/~dispenser/cgi-bin/rdcheck.py?page=mysql)
+
 etc.
 
 For MySql we can see that we get important matches from the redirect links itself.
