@@ -19,13 +19,6 @@ from wikipedia_data_extractor import get_entities_from_csv
 from sklearn.feature_extraction.text import TfidfTransformer
 
 
-def clean_dtm(df):
-    "Cleans TDM by removing columns with all zeros"
-    ddf = df.astype(float, errors='ignore')
-    ddf = df.loc[(df.sum(axis=1) != 0), (df.sum(axis=0) != 0)]
-    return ddf
-
-
 def get_tfidf_matrix(data_matrix):
     "Returns TFIDF matrix"
     tfidf = TfidfTransformer()
@@ -85,22 +78,20 @@ class DTM():
         rows = len(self.abstract_list)
         columns = len(self.entity_list)
 
+        # Cleans Empty columns and get TF*IDF frequencies of entities
+        df = get_tfidf_matrix(matrix)
+
         df = pd.DataFrame(
-            matrix,
+            df.as_matrix(),
             columns=[entity for entity in self.entity_list],
             index=[entity for entity in self.title_list]
         )
 
         index_name = 'Entity'
         df.index.name = index_name
-        #df.to_csv('DTM_%d_%d.csv' % (rows, columns), index=True)
-
-        # Cleans Empty columns and get TF*IDF frequencies of entities
-        df = clean_dtm(df)
-        df = get_tfidf_matrix(df)
 
         # Outputs a Document Term matrix
-        df.to_csv('DTM_%d_%d.csv' % (rows, columns), index=True)
+        df.to_csv('data_files/DTM_%d_%d.csv' % (rows, columns), index=True)
         print '\n\nDone.'
         return df
 
