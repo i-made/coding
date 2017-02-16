@@ -10,7 +10,7 @@
 #include <limits>
 using namespace std;
 
-int Merge(int* arr, int p, int q, int r) {
+int* Merge(int* arr, int p, int q, int  r) {
 
     // Question : In c++ does the array start with 0 or 1?
     // Ans : starts with 0 same as python
@@ -45,8 +45,6 @@ int Merge(int* arr, int p, int q, int r) {
 
 
     // Beware C++ doesn't allow single quotes in place of double quotes
-    // cout << "Value of L " << L[0];
-    // cout << "Value of R " << R[0];
 
     int i = 0;
     int j = 0;
@@ -65,49 +63,41 @@ int Merge(int* arr, int p, int q, int r) {
             j++;
         }
     }
+    cout << "Sorted Array" << endl;
     for ( unsigned int k = 0; k < r; k = k + 1 )
     {
         cout << arr[k] << ",";
 
     }
-    cout << "**********************" << endl;
-    // return arr;
-
+    return arr;
 }
 
 int* MergeSort(int* A, int p, int r)
 {
+    cout << endl;
+    cout << "Inside MergeSort function with " << endl;
+    cout << "P = " << p << endl;
+    cout << "R = " << r << endl;
+    cout << "Array" << endl;
+    for ( unsigned int k = p; k < r; k = k + 1 )
+    {
+        cout << A[k] << ",";
+
+    }
     if (p < r)
     {
         int q = (p + r) / 2;
-        cout << q << endl;
         MergeSort(A, p, q);
-        for ( unsigned int k = 0; k < 7; k = k + 1 )
-        {
-            cout << A[k] << ",";
-
-        }
-        cout << "left sort done" << endl;
         MergeSort(A, q + 1, r);
-        for ( unsigned int k = 0; k < 7; k = k + 1 )
-        {
-            cout << A[k] << ",";
-
-        }
-        cout << "right sort done" << endl;
-        cout << "Merging.." << endl;
         Merge(A, p, q, r);
     }
 }
 
 int main ()
 {
-    int arr[] = {110, 2, 3, 4, 5, 228, 8};
+    int arr[] = {5, 2, 4, 7, 1, 3, 2, 6};
     int size = sizeof(arr) / sizeof(arr[0]);
     int* t = MergeSort(arr, 0, size);
-    cout << "------------------------" << endl;
-    cout << "final sorted vector" << endl;
-    cout << "------------------------" << endl;
     for ( unsigned int k = 0; k < size; k = k + 1 )
     {
         cout << t[k] << ",";
