@@ -10,7 +10,7 @@
 #include <limits>
 using namespace std;
 
-int* Merge(int* arr, int p, int q, int  r) {
+void Merge(int arr[], int p, int q, int  r) {
 
     // Question : In c++ does the array start with 0 or 1?
     // Ans : starts with 0 same as python
@@ -21,8 +21,8 @@ int* Merge(int* arr, int p, int q, int  r) {
     int n2 = r - q;
 
     // Initialising arrays L and R
-    int L[n1 + 1];
-    int R[n2 + 1];
+    int L[n1];
+    int R[n2];
 
     // Question : What is correct i++ or ++i?
 
@@ -31,24 +31,45 @@ int* Merge(int* arr, int p, int q, int  r) {
     // So here i as good as not declared
     for (int i = 0; i < n1; i++)
     {
-        L[i] = arr[i];
+        L[i] = arr[p + i];
     }
     for (int j = 0; j < n2; j++)
     {
         // stuck here to figure out what goes in bracket after A
-        R[j] = arr[n1 + j];
+        R[j] = arr[q + 1 + j];
     }
 
     // Assigning infinity as last elements
     L[n1] = numeric_limits<int>::max();
     R[n2] = numeric_limits<int>::max();
 
+    // Printing
+    cout << endl;
+    cout << ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;" << endl;
+    cout << "Inside MERGE function with " << endl;
+    cout << "P = " << p << endl;
+    cout << "Q = " << q << endl;
+    cout << "R = " << r << endl;
+    cout << "LeftArray" << endl;
+    for ( unsigned int k = p; k < n1 + 1; k = k + 1 )
+    {
+        cout << L[k] << ",";
+
+    }
+    cout << endl;
+    cout << "RightArray" << endl;
+    for ( unsigned int k = p; k < n2 + 1; k = k + 1 )
+    {
+        cout << R[k] << ",";
+
+    }
+
 
     // Beware C++ doesn't allow single quotes in place of double quotes
 
     int i = 0;
     int j = 0;
-    for (int k = p; k < r; k++)
+    for (int k = p; k < r + 1; k++)
     {
         if (L[i] <= R[j])
         {
@@ -63,16 +84,17 @@ int* Merge(int* arr, int p, int q, int  r) {
             j++;
         }
     }
+    cout << endl;
     cout << "Sorted Array" << endl;
-    for ( unsigned int k = 0; k < r; k = k + 1 )
+    for ( unsigned int k = 0; k < r + 1; k = k + 1 )
     {
         cout << arr[k] << ",";
 
     }
-    return arr;
+    cout << endl << ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;" << endl;
 }
 
-int* MergeSort(int* A, int p, int r)
+void MergeSort(int A[], int p, int r)
 {
     cout << endl;
     cout << "Inside MergeSort function with " << endl;
@@ -86,10 +108,18 @@ int* MergeSort(int* A, int p, int r)
     }
     if (p < r)
     {
-        int q = (p + r) / 2;
+        // Very tricky this line
+        int q = (r - p) / 2;
+        cout << endl;
+        cout << "Q = " << q << endl;
+
         MergeSort(A, p, q);
         MergeSort(A, q + 1, r);
         Merge(A, p, q, r);
+    }
+    else
+    {
+        cout << "Going to next MergeSort Call / Merge.................................." << endl;
     }
 }
 
@@ -97,10 +127,10 @@ int main ()
 {
     int arr[] = {5, 2, 4, 7, 1, 3, 2, 6};
     int size = sizeof(arr) / sizeof(arr[0]);
-    int* t = MergeSort(arr, 0, size);
+    MergeSort(arr, 0, size - 1);
     for ( unsigned int k = 0; k < size; k = k + 1 )
     {
-        cout << t[k] << ",";
+        cout << arr[k] << ",";
 
     }
     return 0;
