@@ -1,3 +1,8 @@
+'''
+Author: Nikhil Kulkarni
+Desc:   stock span problem
+'''
+
 
 def get_stock_price(sample_array):
     output = []
@@ -16,30 +21,29 @@ def get_stock_price(sample_array):
 
 
 def get_stock_price_linear(m):
-    op = []
-    p = []
+
+    op = [1]
+    x = m[0]
     max_at = 0
+    p = [[m[0]]]
 
-    for i in range(0, len(m)):
+    for i in range(1, len(m)):
 
-        print 'output', op
-        if i == 0:
-            op.append(1)
-            p.append([m[i]])
-            x = m[i]
-            continue
+        print '-' * 70
+        print 'index', i, 'value', m[i]
 
         if m[i - 1] <= m[i]:
             p[-1].append(m[i])
         else:
             p.append([m[i]])
-        u = len(p[-1]) - 1
 
         if m[i] >= x:
             u = u + op[max_at]
             max_at = i
 
-        x = max(x, m[i - 1], m[i])
+        u = i - max_at
+
+        x = max(x, m[i])
 
         op.append(u)
 
@@ -47,15 +51,16 @@ def get_stock_price_linear(m):
         print 'max_at', max_at
         print 'max_till_now', x
 
-    print 'output', op
+        print 'output', op
+    print 'Final Output', op
     return op
 
 if __name__ == '__main__':
+
     # sample_array = [100, 80, 60, 70, 60, 75, 85]
-    sample_array = [34, 56, 35, 85, 10, 90, 100, 101, 30]
+    sample_array = [100, 80, 60, 70, 60, 75, 85]
     print sample_array
-    output_array = [1, 2, 1, 4, 1, 6]
+    output_array = [1, 1, 1, 2, 1, 4, 6]
     print 'output_array expected', output_array
     outpute = get_stock_price_linear(sample_array)
-    # outpute = get_stock_price(sample_array)
     assert(outpute == output_array)
