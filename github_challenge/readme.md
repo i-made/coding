@@ -115,7 +115,7 @@ for i in range(10, 40):
     print i, score
 ~~~~
 
-My own implementation of K-Means clustering is available [here](https://github.com/nikhilkul/info-extraction/blob/master/kmeans_info.py)
+My own implementation of K-Means clustering is available [here](https://github.com/nikhilkul/JohnsHopkinsCourses/blob/master/info_extraction/hw1/kmeans_info.py)
 
 Since the formed clusters using this method did not show satisfactory results, I decided to compute [cosine similarity](https://en.wikipedia.org/wiki/Cosine_similarity) between each vector to find which vectors are similar.
 
